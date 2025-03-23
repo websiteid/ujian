@@ -1,0 +1,303 @@
+<!DOCTYPE html> 
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Ujian</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #87CEFA, #FFC0CB);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+         .logo {
+            width: 120px; 
+            display: block;
+            margin: 0 auto 15px; 
+         }
+        .form-group label {
+            width: 30%;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #timer {
+            font-size: 18px;
+            color: red;
+            font-weight: bold;
+        }
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 20px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+           }
+        .logo {
+            width: 100px; 
+            display: block;
+            margin: 0 auto 10px; 
+        }
+        h1 {
+            color: #333;
+            font-size: 20px;
+        }
+        .form-group {
+            text-align: left;
+            margin: 10px 0;
+        }
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 14px;
+        }
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 10px;
+        }
+        #timer {
+            font-size: 18px;
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff3cd;
+            display: inline-block;
+            width: 100%;
+        }
+        .user-info {
+            text-align: left;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #f0f0f0;
+        }
+    </style>
+    <script>
+        let timeLeft = 4800;
+
+        function startTimer() {
+            let timerInterval = setInterval(() => {
+               let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                document.getElementById("timer").innerText = `Sisa Waktu: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(timerInterval);
+                    alert("Waktu Habis! Ujian Selesai.");
+                    document.getElementById("examForm").submit();
+                }
+            }, 1000);
+        }
+
+        function saveUserData(event) {
+            event.preventDefault();
+            document.getElementById("displayNama").innerText = document.getElementById("nama").value;
+            document.getElementById("displayKelas").innerText = document.getElementById("kelas").value;
+            document.getElementById("displayAbsen").innerText = document.getElementById("absen").value;
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("examContainer").style.display = "block";
+            startTimer();
+        }
+
+        function checkAnswers(event) {
+            event.preventDefault();
+            if (!confirm("Apakah Anda yakin ingin mengirim jawaban?")) return;
+            let correctAnswers = { q1: "8", q2: "8" };
+            let score = 0;
+            Object.keys(correctAnswers).forEach(question => {
+                let selected = document.querySelector(`input[name='${question}']:checked`);
+                if (selected && selected.value === correctAnswers[question]) {
+                    score++;
+                }
+            });
+            document.getElementById("examContainer").style.display = "none";
+            document.getElementById("resultContainer").style.display = "block";
+            document.getElementById("resultNama").innerText = document.getElementById("displayNama").innerText;
+            document.getElementById("resultKelas").innerText = document.getElementById("displayKelas").innerText;
+            document.getElementById("resultAbsen").innerText = document.getElementById("displayAbsen").innerText;
+            document.getElementById("score").innerText = `Nilai Anda: ${score} / ${Object.keys(correctAnswers).length}`;
+        }
+            function downloadResult() {
+            let nama = document.getElementById("resultNama").innerText;
+            let kelas = document.getElementById("resultKelas").innerText;
+            let absen = document.getElementById("resultAbsen").innerText;
+            let nilai = document.getElementById("score").innerText;
+            
+            let hasilUjian = `Nama: ${nama}\nKelas: ${kelas}\nNo Absen: ${absen}\n${nilai}`;
+            let blob = new Blob([hasilUjian], { type: "text/plain" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Hasil_Ujian_${nama}.txt`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        function logout() {
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <div class="container" id="loginContainer">
+      <img src="https://assets.onecompiler.app/43cen5xjm/43cmpne8f/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" alt="Logo E-Learning" class="logo">
+        <h1>Selamat Datang di E-Ujian</h1>
+        <p>Silakan login untuk memulai ujian!</p>
+        <form id="loginForm" onsubmit="saveUserData(event)">
+            <div class="form-group">
+                <label>Nama Lengkap:</label>
+                <input type="text" id="nama" required>
+            </div>
+            <div class="form-group">
+                <label>Kelas:</label>
+                <select id="kelas" required>
+                    <option value="">Pilih Kelas</option>
+                    <option value="10.1">10.1</option>
+                    <option value="10.2">10.2</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>No Absen:</label>
+                <select id="absen" required>
+                    <option value="">Pilih No Absen</option>
+                    <!-- Generate option 1-36 -->
+                    <script>
+                        let absenSelect = document.getElementById("absen");
+                        for (let i = 1; i <= 36; i++) {
+                            let option = document.createElement("option");
+                            option.value = i;
+                            option.textContent = i;
+                            absenSelect.appendChild(option);
+                        }
+                    </script>
+                </select>
+            </div>
+            <button type="submit">Masuk</button>
+        </form>
+    </div>
+
+    <div class="container" id="examContainer" style="display:none;">
+       <img src="https://assets.onecompiler.app/43cen5xjm/43cmpne8f/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" alt="Logo E-Learning" class="logo">
+        <h1>E-Ujian</h1>
+        <div class="user-info">
+           <p><strong>Nama:</strong> <span id="displayNama"></span></p>
+            <p><strong>Kelas:</strong> <span id="displayKelas"></span></p>
+            <p><strong>No Absen:</strong> <span id="displayAbsen"></span></p>
+        </div>
+        <p id="timer">Sisa Waktu: 80:00</p>
+        <form id="examForm" onsubmit="checkAnswers(event)">
+            <table>
+                <tr>
+                    <th>No</th>
+                    <th>Soal</th>
+                    <th>Opsi</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Berapa hasil dari 5 + 3?</td>
+                    <td>
+                        <input type="radio" name="q1" value="6"> 6<br>
+                        <input type="radio" name="q1" value="7"> 7<br>
+                        <input type="radio" name="q1" value="8"> 8<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Berapa hasil dari 5 + 3?</td>
+                    <td>
+                        <input type="radio" name="q2" value="9"> 9<br>
+                        <input type="radio" name="q2" value="a"> a<br>
+                        <input type="radio" name="q2" value="jjk"> jjk<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Berapa hasil dari 5 + 3?</td>
+                    <td>
+                        <input type="radio" name="q2" value="9"> 9<br>
+                        <input type="radio" name="q2" value="a"> a<br>
+                        <input type="radio" name="q2" value="jjk"> jjk<br>
+                    </td>
+                </tr>
+            </table>
+            <button type="submit">Kirim Jawaban</button>
+        </form>
+    </div>
+    <div class="container" id="resultContainer" style="display:none;">
+      <img src="https://assets.onecompiler.app/43cen5xjm/43cmpne8f/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" alt="Logo E-Learning" class="logo">
+        <h1>Hasil Ujian</h1>
+        <table>
+            <tr><th>Nama</th><td id="resultNama"></td></tr>
+            <tr><th>Kelas</th><td id="resultKelas"></td></tr>
+            <tr><th>No Absen</th><td id="resultAbsen"></td></tr>
+            <tr><th>Nilai</th><td id="score"></td></tr>
+        </table>
+        <button onclick="downloadResult()">Download Hasil</button>
+    </div>
+</body>
+</html>
