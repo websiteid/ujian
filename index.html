@@ -53,11 +53,6 @@
             border-radius: 5px;
             font-size: 14px;
         }
-        #timer {
-            font-size: 18px;
-            color: red;
-            font-weight: bold;
-        }
         .logout-btn {
             background: #dc3545;
             margin-top: 20px;
@@ -93,11 +88,12 @@
             background: #28a745;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 8px;
             cursor: pointer;
             border-radius: 5px;
-            width: 100%;
+            width: auto;
             font-size: 14px;
+            margin: 5px;
         }
         .logout-btn {
             background: #dc3545;
@@ -115,26 +111,34 @@
             display: inline-block;
             width: 100%;
         }
-        .user-info {
+       .user-info {
             text-align: left;
             margin-bottom: 20px;
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 15px;
             border-radius: 5px;
             background: #f8f9fa;
+            font-size: 18px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            font-size: 18px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 15px;
             text-align: left;
         }
         th {
             background: #f0f0f0;
+        }
+        .question-container {
+            display: none;
+        }
+        .question-container.active {
+            display: table;
         }
     </style>
     <script>
@@ -236,6 +240,32 @@
                             option.textContent = i;
                             absenSelect.appendChild(option);
                         }
+                               let currentQuestion = 0;
+        function showQuestion(index) {
+            let questions = document.querySelectorAll(".question-container");
+            questions.forEach((q, i) => {
+                q.classList.remove("active");
+                if (i === index) {
+                    q.classList.add("active");
+                }
+            });
+        }
+        function nextQuestion() {
+            let questions = document.querySelectorAll(".question-container");
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }
+        }
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        }
+        window.onload = function () {
+            showQuestion(0);
+        };
                     </script>
                 </select>
             </div>
@@ -245,20 +275,15 @@
 
     <div class="container" id="examContainer" style="display:none;">
        <img src="https://assets.onecompiler.app/43cen5xjm/43cmpne8f/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" alt="Logo E-Learning" class="logo">
-        <h1>E-Ujian</h1>
         <div class="user-info">
-           <p><strong>Nama:</strong> <span id="displayNama"></span></p>
+            <p><strong>Nama:</strong> <span id="displayNama"></span></p>
             <p><strong>Kelas:</strong> <span id="displayKelas"></span></p>
             <p><strong>No Absen:</strong> <span id="displayAbsen"></span></p>
         </div>
         <p id="timer">Sisa Waktu: 80:00</p>
-        <form id="examForm" onsubmit="checkAnswers(event)">
-            <table>
-                <tr>
-                    <th>No</th>
-                    <th>Soal</th>
-                    <th>Opsi</th>
-                </tr>
+        <form id="examForm">
+            <table class="question-container active">
+                <tr><th>No</th><th>Soal</th><th>Opsi</th></tr>
                 <tr>
                     <td>1</td>
                     <td>Berapa hasil dari 5 + 3?</td>
@@ -268,25 +293,21 @@
                         <input type="radio" name="q1" value="8"> 8<br>
                     </td>
                 </tr>
+            </table>
+            <table class="question-container">
+                <tr><th>No</th><th>Soal</th><th>Opsi</th></tr>
                 <tr>
                     <td>2</td>
-                    <td>Berapa hasil dari 5 + 3?</td>
+                    <td>Berapa hasil dari 10 - 2?</td>
                     <td>
                         <input type="radio" name="q2" value="9"> 9<br>
-                        <input type="radio" name="q2" value="a"> a<br>
-                        <input type="radio" name="q2" value="jjk"> jjk<br>
-                    </td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Berapa hasil dari 5 + 3?</td>
-                    <td>
-                        <input type="radio" name="q2" value="9"> 9<br>
-                        <input type="radio" name="q2" value="a"> a<br>
-                        <input type="radio" name="q2" value="jjk"> jjk<br>
+                        <input type="radio" name="q2" value="8"> 8<br>
+                        <input type="radio" name="q2" value="7"> 7<br>
                     </td>
                 </tr>
             </table>
+            <button type="button" onclick="prevQuestion()">Sebelumnya</button>
+            <button type="button" onclick="nextQuestion()">Selanjutnya</button>
             <button type="submit">Kirim Jawaban</button>
         </form>
     </div>
